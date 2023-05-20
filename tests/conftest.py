@@ -1,10 +1,12 @@
 import asyncio
 import os
-from typing import Any, Generator
+from typing import Any
+from typing import Generator
 
 import asyncpg
 import pytest
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
@@ -33,23 +35,15 @@ def event_loop():
 
 @pytest.fixture(scope="session", autouse=True)
 async def run_migrations():
-    os.system('alembic init migrations')
+    os.system("alembic init migrations")
     os.system('alembic revision --autogenerate -m "test running migrations"')
-    os.system('alembic upgrade heads')
+    os.system("alembic upgrade heads")
 
 
 @pytest.fixture(scope="session")
 async def async_session_test():
-    engine = create_async_engine(
-        settings.TEST_DATABASE_URL,
-        future=True,
-        echo=True
-    )
-    async_session = sessionmaker(
-        engine,
-        expire_on_commit=False,
-        class_=AsyncSession
-    )
+    engine = create_async_engine(settings.TEST_DATABASE_URL, future=True, echo=True)
+    async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     yield async_session
 
 
@@ -66,18 +60,14 @@ async def _get_test_db():
     try:
         # create async engine for interaction with database
         test_engine = create_async_engine(
-            settings.TEST_DATABASE_URL,
-            future=True,
-            echo=True
+            settings.TEST_DATABASE_URL, future=True, echo=True
         )
 
         # create session for the interaction with database
         test_async_session = sessionmaker(
-            test_engine,
-            expire_on_commit=False,
-            class_=AsyncSession
+            test_engine, expire_on_commit=False, class_=AsyncSession
         )
-        
+
         yield test_async_session()
 
     finally:
@@ -98,7 +88,9 @@ async def client() -> Generator[TestClient, Any, None]:
 
 @pytest.fixture(scope="session")
 async def asyncpg_pool():
-    pool = await asyncpg.create_pool("".join(settings.TEST_DATABASE_URL.split("+asyncpg")))
+    pool = await asyncpg.create_pool(
+        "".join(settings.TEST_DATABASE_URL.split("+asyncpg"))
+    )
     yield pool
     await pool.close()
 
@@ -108,24 +100,22 @@ async def get_user_from_database(asyncpg_pool):
     """Для тестов, которые будут нуждаться в функции чтения из базы данных
     по пользователю.
     """
+
     async def get_user_from_database_by_uuid(user_id: str):
         """Чтение данных из базы."""
         # Создание соединения с базой данных.
         async with asyncpg_pool.acquire() as connection:
-            return await connection.fetch("""SELECT * FROM users WHERE user_id = $1;""", user_id)
-    
+            return await connection.fetch(
+                """SELECT * FROM users WHERE user_id = $1;""", user_id
+            )
+
     return get_user_from_database_by_uuid
 
 
 @pytest.fixture
 async def create_user_in_database(asyncpg_pool):
-
     async def create_user_in_database(
-        user_id: str,
-        name: str,
-        surname: str,
-        email: str,
-        is_active: bool
+        user_id: str, name: str, surname: str, email: str, is_active: bool
     ):
         async with asyncpg_pool.acquire() as connection:
             return await connection.execute(
@@ -134,7 +124,7 @@ async def create_user_in_database(asyncpg_pool):
                 name,
                 surname,
                 email,
-                is_active
-                )
-    
+                is_active,
+            )
+
     return create_user_in_database

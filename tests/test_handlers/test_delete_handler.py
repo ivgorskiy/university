@@ -1,17 +1,13 @@
 from uuid import uuid4
 
 
-async def test_delete_user(
-    client,
-    create_user_in_database,
-    get_user_from_database
-    ):
+async def test_delete_user(client, create_user_in_database, get_user_from_database):
     user_data = {
         "user_id": uuid4(),
         "name": "Delete",
         "surname": "User",
         "email": "delete@sdf.com",
-        "is_active": True
+        "is_active": True,
     }
     await create_user_in_database(**user_data)
     resp = client.delete(f"/user/?user_id={user_data['user_id']}")
@@ -42,7 +38,7 @@ async def test_delete_user_user_id_validation_error(client):
             {
                 "loc": ["query", "user_id"],
                 "msg": "value is not a valid uuid",
-                "type": "type_error.uuid"
+                "type": "type_error.uuid",
             }
         ]
     }

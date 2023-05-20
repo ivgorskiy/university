@@ -1,7 +1,7 @@
 """test running migrations
 
 Revision ID: b2f49fa6053f
-Revises: 
+Revises:
 Create Date: 2023-05-10 15:40:56.799593
 
 """

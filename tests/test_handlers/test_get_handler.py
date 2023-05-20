@@ -7,7 +7,7 @@ async def test_get_user(client, create_user_in_database, get_user_from_database)
         "name": "Get",
         "surname": "User",
         "email": "get@sdf.com",
-        "is_active": True
+        "is_active": True,
     }
     await create_user_in_database(**user_data)
     resp = client.get(f"/user/?user_id={user_data['user_id']}")
@@ -23,13 +23,13 @@ async def test_get_user(client, create_user_in_database, get_user_from_database)
 async def test_get_user_id_validation_error(
     client,
     create_user_in_database,
-    ):
+):
     user_data = {
         "user_id": uuid4(),
         "name": "User_id",
         "surname": "Test_validation",
         "email": "userid@sdf.com",
-        "is_active": True
+        "is_active": True,
     }
     await create_user_in_database(**user_data)
     resp = client.get("/user/?user_id=123")
@@ -40,7 +40,7 @@ async def test_get_user_id_validation_error(
             {
                 "loc": ["query", "user_id"],
                 "msg": "value is not a valid uuid",
-                "type": "type_error.uuid"
+                "type": "type_error.uuid",
             }
         ]
     }
@@ -49,13 +49,13 @@ async def test_get_user_id_validation_error(
 async def test_get_user_not_found(
     client,
     create_user_in_database,
-    ):
+):
     user_data = {
         "user_id": uuid4(),
         "name": "Get_user",
         "surname": "Not_found",
         "email": "get_user@sdf.com",
-        "is_active": True
+        "is_active": True,
     }
     user_id_for_finding = uuid4()
     await create_user_in_database(**user_data)

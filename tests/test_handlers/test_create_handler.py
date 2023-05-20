@@ -4,11 +4,7 @@ import pytest
 
 
 async def test_create_user(client, get_user_from_database):
-    user_data = {
-        "name": "Create",
-        "surname": "User",
-        "email": "create@sdf.com"
-    }
+    user_data = {"name": "Create", "surname": "User", "email": "create@sdf.com"}
     resp = client.post("/user", data=json.dumps(user_data))
     data_from_resp = resp.json()
     assert resp.status_code == 200
@@ -26,18 +22,9 @@ async def test_create_user(client, get_user_from_database):
     assert str(user_from_db["user_id"]) == data_from_resp["user_id"]
 
 
-
 async def test_create_user_duplicate_email_error(client, get_user_from_database):
-    user_data = {
-        "name": "Ivan",
-        "surname": "Ivanov",
-        "email": "duplicate@sdf.com"
-    }
-    user_data_same = {
-        "name": "Petr",
-        "surname": "Petrov",
-        "email": "duplicate@sdf.com"
-    }
+    user_data = {"name": "Ivan", "surname": "Ivanov", "email": "duplicate@sdf.com"}
+    user_data_same = {"name": "Petr", "surname": "Petrov", "email": "duplicate@sdf.com"}
     resp = client.post("/user/", data=json.dumps(user_data))
     data_from_resp = resp.json()
     assert resp.status_code == 200
@@ -63,61 +50,58 @@ async def test_create_user_duplicate_email_error(client, get_user_from_database)
 
 @pytest.mark.parametrize(
     "user_data_for_creation, expected_status_code, expected_detail",
-[
-    (
-        {},
-        422,
-        {
-            "detail": [
-                {
-                    "loc": ["body", "name"],
-                    "msg": "field required",
-                    "type": "value_error.missing"
-                },
-                {
-                    "loc": ["body", "surname"],
-                    "msg": "field required",
-                    "type": "value_error.missing"
-                },
-                {
-                    "loc": ["body", "email"],
-                    "msg": "field required",
-                    "type": "value_error.missing"
-                },
-            ]
-        },
-    ),
-    (
-        {"name": 123, "surname": 456, "email": "lol"},
-        422,
-        {"detail": "Name should contains only letters"},
-    ),
-    (
-        {"name": "Ivan", "surname": 456, "email": "lol"},
-        422,
-        {"detail": "Surname should contains only letters"},
-    ),
-    (
-        {"name": "Ivan", "surname": "Ivanov", "email": "lol"},
-        422,
-        {
-            "detail": [
-                {
-                    "loc": ["body", "email"],
-                    "msg": "value is not a valid email address",
-                    "type": "value_error.email"
-                }
-            ]
-        }
-    )
-]
+    [
+        (
+            {},
+            422,
+            {
+                "detail": [
+                    {
+                        "loc": ["body", "name"],
+                        "msg": "field required",
+                        "type": "value_error.missing",
+                    },
+                    {
+                        "loc": ["body", "surname"],
+                        "msg": "field required",
+                        "type": "value_error.missing",
+                    },
+                    {
+                        "loc": ["body", "email"],
+                        "msg": "field required",
+                        "type": "value_error.missing",
+                    },
+                ]
+            },
+        ),
+        (
+            {"name": 123, "surname": 456, "email": "lol"},
+            422,
+            {"detail": "Name should contains only letters"},
+        ),
+        (
+            {"name": "Ivan", "surname": 456, "email": "lol"},
+            422,
+            {"detail": "Surname should contains only letters"},
+        ),
+        (
+            {"name": "Ivan", "surname": "Ivanov", "email": "lol"},
+            422,
+            {
+                "detail": [
+                    {
+                        "loc": ["body", "email"],
+                        "msg": "value is not a valid email address",
+                        "type": "value_error.email",
+                    }
+                ]
+            },
+        ),
+    ],
 )
 async def test_create_user_validation_error(
-    client,
-    user_data_for_creation,
-    expected_status_code,
-    expected_detail
-    ):
+    client, user_data_for_creation, expected_status_code, expected_detail
+):
     resp = client.post("/user/", data=json.dumps(user_data_for_creation))
     data_from_resp = resp.json()
     assert resp.status_code == expected_status_code
