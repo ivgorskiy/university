@@ -115,7 +115,12 @@ async def get_user_from_database(asyncpg_pool):
 @pytest.fixture
 async def create_user_in_database(asyncpg_pool):
     async def create_user_in_database(
-        user_id: str, name: str, surname: str, email: str, is_active: bool
+        user_id: str,
+        name: str,
+        surname: str,
+        email: str,
+        is_active: bool,
+        hashed_password: str,
     ):
         async with asyncpg_pool.acquire() as connection:
             return await connection.execute(
@@ -125,6 +130,7 @@ async def create_user_in_database(asyncpg_pool):
                 surname,
                 email,
                 is_active,
+                hashed_password,
             )
 
     return create_user_in_database

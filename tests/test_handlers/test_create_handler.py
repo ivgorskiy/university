@@ -4,7 +4,13 @@ import pytest
 
 
 async def test_create_user(client, get_user_from_database):
-    user_data = {"name": "Create", "surname": "User", "email": "create@sdf.com"}
+    user_data = {
+        "name": "Create",
+        "surname": "User",
+        "email": "create@sdf.com",
+        "password": "SamplePass1!",
+    }
+
     resp = client.post("/user", data=json.dumps(user_data))
     data_from_resp = resp.json()
     assert resp.status_code == 200
@@ -12,6 +18,7 @@ async def test_create_user(client, get_user_from_database):
     assert data_from_resp["surname"] == user_data["surname"]
     assert data_from_resp["email"] == user_data["email"]
     assert data_from_resp["is_active"] is True
+
     users_from_db = await get_user_from_database(data_from_resp["user_id"])
     assert len(users_from_db) == 1
     user_from_db = dict(users_from_db[0])
@@ -23,8 +30,19 @@ async def test_create_user(client, get_user_from_database):
 
 
 async def test_create_user_duplicate_email_error(client, get_user_from_database):
-    user_data = {"name": "Ivan", "surname": "Ivanov", "email": "duplicate@sdf.com"}
-    user_data_same = {"name": "Petr", "surname": "Petrov", "email": "duplicate@sdf.com"}
+    user_data = {
+        "name": "Ivan",
+        "surname": "Ivanov",
+        "email": "duplicate@sdf.com",
+        "password": "SamplePass1!",
+    }
+    user_data_same = {
+        "name": "Petr",
+        "surname": "Petrov",
+        "email": "duplicate@sdf.com",
+        "password": "SamplePass1!",
+    }
+
     resp = client.post("/user/", data=json.dumps(user_data))
     data_from_resp = resp.json()
     assert resp.status_code == 200
@@ -32,6 +50,7 @@ async def test_create_user_duplicate_email_error(client, get_user_from_database)
     assert data_from_resp["surname"] == user_data["surname"]
     assert data_from_resp["email"] == user_data["email"]
     assert data_from_resp["is_active"] is True
+
     users_from_db = await get_user_from_database(data_from_resp["user_id"])
     assert len(users_from_db) == 1
     user_from_db = dict(users_from_db[0])

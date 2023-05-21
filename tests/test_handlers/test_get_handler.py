@@ -1,13 +1,14 @@
 from uuid import uuid4
 
 
-async def test_get_user(client, create_user_in_database, get_user_from_database):
+async def test_get_user(client, create_user_in_database):
     user_data = {
         "user_id": uuid4(),
         "name": "Get",
         "surname": "User",
         "email": "get@sdf.com",
         "is_active": True,
+        "hashed_password": "SampleHashPass",
     }
     await create_user_in_database(**user_data)
     resp = client.get(f"/user/?user_id={user_data['user_id']}")
@@ -30,9 +31,11 @@ async def test_get_user_id_validation_error(
         "surname": "Test_validation",
         "email": "userid@sdf.com",
         "is_active": True,
+        "hashed_password": "SampleHashedPass",
     }
+    incorrect_user_id = 123
     await create_user_in_database(**user_data)
-    resp = client.get("/user/?user_id=123")
+    resp = client.get(f"/user/?user_id={incorrect_user_id}")
     assert resp.status_code == 422
     data_from_response = resp.json()
     assert data_from_response == {
@@ -56,6 +59,7 @@ async def test_get_user_not_found(
         "surname": "Not_found",
         "email": "get_user@sdf.com",
         "is_active": True,
+        "hashed_password": "SampleHashedPass",
     }
     user_id_for_finding = uuid4()
     await create_user_in_database(**user_data)
