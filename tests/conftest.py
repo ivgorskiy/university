@@ -1,5 +1,5 @@
 import asyncio
-import os
+import subprocess
 from typing import Any
 from typing import Generator
 
@@ -35,9 +35,19 @@ def event_loop():
 
 @pytest.fixture(scope="session", autouse=True)
 async def run_migrations():
-    os.system("alembic init migrations")
-    os.system('alembic revision --autogenerate -m "test running migrations"')
-    os.system("alembic upgrade heads")
+    working_directory = "."
+    cmd_1 = ["alembic", "init", "migrations"]
+    cmd_2 = ["alembic", "revision", "--autogenerate", "-m", "test"]
+    cmd_3 = ["alembic", "upgrade", "heads"]
+
+    for cmd in [cmd_1, cmd_2, cmd_3]:
+        subprocess.Popen(
+            cmd,
+            shell=True,
+            cwd=working_directory,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
 
 
 @pytest.fixture(scope="session")
@@ -124,7 +134,7 @@ async def create_user_in_database(asyncpg_pool):
     ):
         async with asyncpg_pool.acquire() as connection:
             return await connection.execute(
-                """INSERT INTO users VALUES ($1, $2, $3, $4, $5)""",
+                """INSERT INTO users VALUES ($1, $2, $3, $4, $5, $6)""",
                 user_id,
                 name,
                 surname,

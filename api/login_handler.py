@@ -19,7 +19,7 @@ from db.session import get_db
 from hashing import Hasher
 from security import create_access_token
 
-login_router = APIRouter
+login_router = APIRouter()
 
 
 async def _get_user_by_email_for_auth(email: str, db: AsyncSession):
@@ -49,16 +49,19 @@ async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
     user = await authenticate_user(form_data.username, form_data.password, db)
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
         )
+
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.email, "other_custom_data": [1, 2, 3, 4]},
         expires_delta=access_token_expires,
     )
+
     return {"access_token": access_token, "token_type": "bearer"}
 
 
@@ -73,7 +76,9 @@ async def get_current_user_from_token(
         detail="Could not validate credentials",
     )
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algoritms=[settings.ALGORITHM])
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
         email: str = payload.get("sub")
         print("username/email extracted is ", email)
 

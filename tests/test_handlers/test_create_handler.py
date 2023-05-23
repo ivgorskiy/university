@@ -90,6 +90,11 @@ async def test_create_user_duplicate_email_error(client, get_user_from_database)
                         "msg": "field required",
                         "type": "value_error.missing",
                     },
+                    {
+                        "loc": ["body", "password"],
+                        "msg": "field required",
+                        "type": "value_error.missing",
+                    },
                 ]
             },
         ),
@@ -104,7 +109,12 @@ async def test_create_user_duplicate_email_error(client, get_user_from_database)
             {"detail": "Surname should contains only letters"},
         ),
         (
-            {"name": "Ivan", "surname": "Ivanov", "email": "lol"},
+            {
+                "name": "Ivan",
+                "surname": "Ivanov",
+                "email": "lol",
+                "password": "SamplePass1!",
+            },
             422,
             {
                 "detail": [
@@ -112,7 +122,7 @@ async def test_create_user_duplicate_email_error(client, get_user_from_database)
                         "loc": ["body", "email"],
                         "msg": "value is not a valid email address",
                         "type": "value_error.email",
-                    }
+                    },
                 ]
             },
         ),
