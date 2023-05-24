@@ -1,7 +1,9 @@
 from uuid import uuid4
 
+from tests.conftest import create_test_auth_headers_for_user
 
-async def test_get_user(client, create_user_in_database):
+
+async def test_get_user(client, create_user_in_database, get_user_from_database):
     user_data = {
         "user_id": uuid4(),
         "name": "Get",
@@ -11,7 +13,10 @@ async def test_get_user(client, create_user_in_database):
         "hashed_password": "SampleHashPass",
     }
     await create_user_in_database(**user_data)
-    resp = client.get(f"/user/?user_id={user_data['user_id']}")
+    resp = client.get(
+        f"/user/?user_id={user_data['user_id']}",
+        headers=create_test_auth_headers_for_user(user_data["email"]),
+    )
     assert resp.status_code == 200
     user_from_response = resp.json()
     assert user_from_response["user_id"] == str(user_data["user_id"])
@@ -22,8 +27,7 @@ async def test_get_user(client, create_user_in_database):
 
 
 async def test_get_user_id_validation_error(
-    client,
-    create_user_in_database,
+    client, create_user_in_database, get_user_from_database
 ):
     user_data = {
         "user_id": uuid4(),
@@ -34,8 +38,12 @@ async def test_get_user_id_validation_error(
         "hashed_password": "SampleHashedPass",
     }
     incorrect_user_id = 123
+
     await create_user_in_database(**user_data)
-    resp = client.get(f"/user/?user_id={incorrect_user_id}")
+    resp = client.get(
+        f"/user/?user_id={incorrect_user_id}",
+        headers=create_test_auth_headers_for_user(user_data["email"]),
+    )
     assert resp.status_code == 422
     data_from_response = resp.json()
     assert data_from_response == {
@@ -50,19 +58,43 @@ async def test_get_user_id_validation_error(
 
 
 async def test_get_user_not_found(
-    client,
-    create_user_in_database,
+    client, create_user_in_database, get_user_from_database
 ):
     user_data = {
         "user_id": uuid4(),
-        "name": "Get_user",
-        "surname": "Not_found",
+        "name": "GetUser",
+        "surname": "NotFound",
         "email": "get_user@sdf.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
     }
     user_id_for_finding = uuid4()
+
     await create_user_in_database(**user_data)
-    resp = client.get(f"/user/?user_id={user_id_for_finding}")
+    resp = client.get(
+        f"/user/?user_id={user_id_for_finding}",
+        headers=create_test_auth_headers_for_user(user_data["email"]),
+    )
     assert resp.status_code == 404
     assert resp.json() == {"detail": f"User with id {user_id_for_finding} not found."}
+
+
+async def test_get_user_unauth_error(
+    client, create_user_in_database, get_user_from_database
+):
+    user_data = {
+        "user_id": uuid4(),
+        "name": "GetUser",
+        "surname": "UnauthError",
+        "email": "get@sdf.com",
+        "is_active": True,
+        "hashed_password": "SampleHashedPass",
+    }
+    user_id_for_finding = uuid4()
+
+    await create_user_in_database(**user_data)
+    resp = client.get(
+        f"/user/?user_id={user_id_for_finding}",
+    )
+    assert resp.status_code == 401
+    assert resp.json() == {"detail": "Not authenticated"}
