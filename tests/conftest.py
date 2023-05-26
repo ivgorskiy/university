@@ -1,5 +1,4 @@
 import asyncio
-import subprocess
 from datetime import timedelta
 from typing import Any
 from typing import Generator
@@ -12,6 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
 import settings
+from db.dals import PortalRole
 from db.session import get_db
 from main import app
 from security import create_access_token
@@ -33,23 +33,6 @@ def event_loop():
 
     # Это исключает появление ошибки "RuntimeError: Event loop is closed"
     asyncio.run(loop.shutdown_asyncgens())
-
-
-@pytest.fixture(scope="session", autouse=True)
-async def run_migrations():
-    working_directory = "."
-    cmd_1 = ["alembic", "init", "migrations"]
-    cmd_2 = ["alembic", "revision", "--autogenerate", "-m", "test"]
-    cmd_3 = ["alembic", "upgrade", "heads"]
-
-    for cmd in [cmd_1, cmd_2, cmd_3]:
-        subprocess.Popen(
-            cmd,
-            shell=True,
-            cwd=working_directory,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
 
 
 @pytest.fixture(scope="session")
@@ -133,16 +116,18 @@ async def create_user_in_database(asyncpg_pool):
         email: str,
         is_active: bool,
         hashed_password: str,
+        roles: list[PortalRole],
     ):
         async with asyncpg_pool.acquire() as connection:
             return await connection.execute(
-                """INSERT INTO users VALUES ($1, $2, $3, $4, $5, $6)""",
+                """INSERT INTO users VALUES ($1, $2, $3, $4, $5, $6, $7)""",
                 user_id,
                 name,
                 surname,
                 email,
                 is_active,
                 hashed_password,
+                roles,
             )
 
     return create_user_in_database

@@ -14,6 +14,7 @@ async def test_update_user(client, create_user_in_database, get_user_from_databa
         "email": "original@sdf.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     user_data_updated = {
         "name": "Update",
@@ -49,6 +50,7 @@ async def test_update_user_check_one_is_updated(
         "email": "one@sdf.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     user_data_two = {
         "user_id": uuid4(),
@@ -57,6 +59,7 @@ async def test_update_user_check_one_is_updated(
         "email": "two@sdf.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     user_data_three = {
         "user_id": uuid4(),
@@ -65,6 +68,7 @@ async def test_update_user_check_one_is_updated(
         "email": "three@sdf.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     user_data_updated = {
         "name": "Updated",
@@ -198,6 +202,7 @@ async def test_update_user_validation_error(
         "email": "asdf@sdf.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
 
     await create_user_in_database(**user_data)
@@ -219,6 +224,7 @@ async def test_update_user_id_validation_error(client, create_user_in_database):
         "email": "user@sdf.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     user_data_updated = {
         "name": "User",
@@ -255,6 +261,7 @@ async def test_update_user_not_found_error(client, create_user_in_database):
         "email": "update@sdf.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     user_data_updated = {"name": "Ivan", "surname": "Ivanov", "email": "ivan@sdf.com"}
     user_id = uuid4()
@@ -279,6 +286,7 @@ async def test_update_user_duplicate_email_error(client, create_user_in_database
         "email": "one@sdf.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     user_data_two = {
         "user_id": uuid4(),
@@ -287,6 +295,7 @@ async def test_update_user_duplicate_email_error(client, create_user_in_database
         "email": "two@sdf.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     user_data_updated = {"email": user_data_two["email"]}
 
