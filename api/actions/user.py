@@ -1,10 +1,10 @@
 from typing import Union
 from uuid import UUID
 
-from api.models import ShowUser
-from api.models import UserCreate
-from db.dals import PortalRole
+from api.schemas import ShowUser
+from api.schemas import UserCreate
 from db.dals import UserDAL
+from db.models import PortalRole
 from db.models import User
 from hashing import Hasher
 
@@ -55,7 +55,7 @@ async def _update_user(
         return updated_user_id
 
 
-async def _get_user_by_id(user_id, session) -> Union[ShowUser, None]:
+async def _get_user_by_id(user_id, session) -> Union[User, None]:
     async with session.begin():
         user_dal = UserDAL(session)
 

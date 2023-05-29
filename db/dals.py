@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import Union
 from uuid import UUID
 
@@ -7,27 +6,12 @@ from sqlalchemy import select
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from db.models import PortalRole
 from db.models import User
 
 ###########################################################
 # BLOCK FOR INTERACTION WITH DATABASE IN BUSINESS CONTEXT #
 ###########################################################
-
-
-# todo почитать про Enum
-# Множественное наследование
-# Enum-объект будет записываться в базу. При наследовании от str (на первом месте)
-# enum-объект преобразуется в строку. Без преобразования попытка записи
-# enum-объекта в базу приведёт к ошибке "Type error". Преобразование работает
-# только если str стоит на первом месте.
-# После преобразования в базу запишутся значения атрибутов.
-# Также, если не наследовать от str, то в тех местах кода, где нужно явное
-# строковое представление вместо roles=[PortalRole.ROLE_PORTAL_USER]
-# нужно будет писать roles=[PortalRole.ROLE_PORTAL_USER.value]
-class PortalRole(str, Enum):
-    ROLE_PORTAL_USER = "ROLE_PORTAL_USER"
-    ROLE_PORTAL_ADMIN = "ROLE_PORTAL_ADMIN"
-    ROLE_PORTAL_SUPERADMIN = "ROLE_PORTAL_SUPERADMIN"
 
 
 class UserDAL:
