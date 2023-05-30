@@ -30,6 +30,7 @@ async def test_add_admin_role_to_user_by_superadmin(
 
     for user_data in [user_data_for_promotion, user_data_who_promoted]:
         await create_user_in_database(**user_data)
+
     resp = client.patch(
         f"/user/admin_privilege?user_id={user_data_for_promotion['user_id']}",
         headers=create_test_auth_headers_for_user(user_data_who_promoted["email"]),
