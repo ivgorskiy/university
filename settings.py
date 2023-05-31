@@ -11,7 +11,7 @@ REAL_DATABASE_URL = env.str(
     default="postgresql+asyncpg://postgres:postgres@127.0.0.1:5432/postgres",
 )
 APP_PORT = env.int("APP_PORT", default=8000)
-IP_ADDRESS = env.str("IP_ADRESS", default="127.0.0.1")
+APP_IP_ADDRESS = env.str("APP_IP_ADDRESS", default="127.0.0.1")
 
 SECRET_KEY: str = env.str("SECRET_KEY", default="secret_key")
 ALGORITHM: str = env.str("ALGORITHM", default="HS256")

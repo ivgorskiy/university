@@ -17,6 +17,7 @@ services:
     image: university_app  # Specify the name of the Docker image to be built
     environment:
       REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
+      IP_ADRESS: "0.0.0.0"
     build:
       context: .
       dockerfile: Dockerfile
