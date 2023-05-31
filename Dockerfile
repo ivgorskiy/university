@@ -3,7 +3,7 @@ FROM $BASE_IMAGE
 
 # system update & package install
 RUN apt-get -y update && \
-    apt-get install -y --noinstall-recommends \
+    apt-get install -y --no-install-recommends \
     build-essential \
     openssl libssl-dev \
     && apt-get clean \
