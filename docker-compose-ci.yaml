@@ -1,4 +1,8 @@
+# Тег версии.
 version: "3.0"
+
+# Сервис = контейнер.
+# Сервисом может быть клиент, сервер, сервер баз данных...
 services:
   db:
     container_name: "db"
@@ -8,16 +12,18 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
+
+    # перенаправление порта контейнера на порт гостевой ОС
+    # [порт ОС]:[порт контейнера]
     ports:
       - "5432:5432"
     networks:
       - custom
   university_app:
     container_name: university_app
-    image: university_app  # Specify the name of the Docker image to be built
+    image: university_app
     environment:
       REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
-      APP_IP_ADDRESS: "0.0.0.0"
     build:
       context: .
       dockerfile: Dockerfile

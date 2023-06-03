@@ -6,3 +6,8 @@ down:
 
 run:
 	docker compose -f docker-compose-ci.yaml up -d
+
+rebuild:
+	docker-compose -f docker-compose-ci.yaml stop
+	docker-compose -f docker-compose-ci.yaml build
+	docker-compose -f docker-compose-ci.yaml up -d
