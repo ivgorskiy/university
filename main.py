@@ -1,3 +1,4 @@
+import sentry_sdk
 import uvicorn
 from fastapi import FastAPI
 from fastapi.routing import APIRouter
@@ -7,12 +8,22 @@ from api.handlers import user_router
 from api.login_handler import login_router
 from api.service import service_router
 
+
+# sentry configuration
+sentry_sdk.init(
+    dsn=settings.SENTRY_URL,
+    # Set traces_sample_rate to 1.0 to capture 100 %
+    # jf transactions for performance monitoring.
+    # We recommend adjusting this value in production
+    traces_sample_rate=1.0,
+)
+
 #########################
 # BLOCK WITH API ROUTES #
 #########################
 
 # create instance of the app
-app = FastAPI(title="Iffs-oxford-university")
+app = FastAPI(title="University")
 
 # create the instance for the routes
 main_api_router = APIRouter()
