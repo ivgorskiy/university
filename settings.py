@@ -3,6 +3,9 @@ from envparse import Env
 
 env = Env()
 
+# Чтение переменных окружения из файла .env для локальной разработки
+env.read_envfile()
+
 REAL_DATABASE_URL = env.str(
     "REAL_DATABASE_URL",
     # connect string for the real database
