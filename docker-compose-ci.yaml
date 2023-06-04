@@ -4,10 +4,16 @@ version: "3.0"
 # Сервис = контейнер.
 # Сервисом может быть клиент, сервер, сервер баз данных...
 services:
+  # База данных
   db:
+    # Имя контейнера. Может быть произвольным.
     container_name: "db"
+
     image: postgres:14.1-alpine
+
     restart: always
+
+    # Значения переменных окружения, передаваемых в контейнер
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -17,20 +23,103 @@ services:
     # [порт ОС]:[порт контейнера]
     ports:
       - "5432:5432"
+
     networks:
       - custom
+
+    # Том, в котором хранится база данных
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  # Основное приложение
   university_app:
+
     container_name: university_app
+
     image: university_app
+
+    # Зависимость: запуск текущего контейнера будет выполнен
+    # после указанных в списке
+    depends_on:
+      - db
+      - alembic_migrations
+
     environment:
       REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
+      SENTRY_URL: "https://a9c3a309c76f4258807ac0f1258ddbf0@o4505300250263552.ingest.sentry.io/4505300255113216"
+
+    # параметры сборки образа
+    build:
+      context: .  # из корневого каталога проекта
+      dockerfile: Dockerfile
+
+    ports:
+      - "8000:8000"
+
+    networks:
+      - custom
+
+  # Автоматические миграции
+  alembic_migrations:
+    container_name: alembic_migrations
+    image: alembic_migrations
+
+    # Команда, выполняющаяся внутри контейнера после его запуска
+    command: ./run.sh
+    depends_on:
+      - db
+    environment:
+      ALEMBIC_DATABASE_URL: "postgresql://postgres:postgres@db:5432/postgres"
+      REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
+      SENTRY_URL: "https://a9c3a309c76f4258807ac0f1258ddbf0@o4505300250263552.ingest.sentry.io/4505300255113216"
+      APP_PORT: "8001"
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "8001:8001"
     networks:
       - custom
+
+  # Метрики
+  prometheus:
+    depends_on:
+      - university_app
+    image: prom/prometheus:v2.43.0
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    networks:
+      - custom
+
+  # Графическое отображение метрик
+  grafana:
+    image: grafana/grafana:8.5.22
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - grafana-config:/etc/grafana
+    depends_on:
+      - prometheus
+    restart: always
+    networks:
+      - custom
+    # Для устранения проблемы логина в Mac OS
+    user: "0"
+
 networks:
   custom:
     driver: bridge
+
+volumes:
+  db-data:
+  grafana-data:
+  grafana-config:
+  prometheus-data:
