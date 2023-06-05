@@ -65,7 +65,7 @@ services:
     image: alembic_migrations
 
     # Команда, выполняющаяся внутри контейнера после его запуска
-    command: ./run.sh
+    command: sh -c 'chmod +x run.sh && ./run.sh'
     depends_on:
       - db
     environment:
