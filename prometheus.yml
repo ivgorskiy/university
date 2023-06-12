@@ -16,17 +16,17 @@ rule_files:
   # - "first.rules"
   # - "second.rules"
 
-# A scrape configuration containing exactly one endpoint to scrape:
-# Here it's Prometheus itself.
+# Конечные точки для сбора информации
 scrape_configs:
-  # The job name is added as a label 'job=<job_name>' to any timeseries scraped from this config.
+  # Мониторинг самого себя
   - job_name: 'prometheus'
 
-    # Override the global default and scrape targets from this job every 5 seconds.
+    # Интервал опроса
     scrape_interval: 5s
     static_configs:
     - targets: ['localhost:9090']
 
+  # Мониторинг приложения
   - job_name: 'starlette_exporter'
     scrape_interval: 5s
     static_configs:
